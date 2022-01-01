@@ -47,12 +47,38 @@ public class Database {
     private PreparedStatement selectStretchByUser;
     private PreparedStatement selectSmartByStretch;
 
+    //Count integer that will return information regarding operations with the database
+    private int count = 0;
 
     /**
      * The Database constructor is private: we only create Database objects 
      * through the getDatabase() method.
      */
     private Database() {
+    }
+
+    class StretchGoalRow{
+        String goal;
+        
+        public StretchGoalRow(String goal){
+            this.goal = goal;
+        }
+    }
+
+    class SmartGoalRow{
+        String specific;
+        String measureable;
+        String attainable;
+        String relevant;
+        String time;
+
+        public SmartGoalRow(String specific, String measureable, String attainable, String relevant, String time){
+            this.specific = specific;
+            this.measureable = measureable;
+            this.attainable = attainable;
+            this.relevant = relevant;
+            this.time = time;
+        }
     }
 
     /**
@@ -173,21 +199,78 @@ public class Database {
         return true;
     }
 
-    int count = 0;
+    /**
+     * Create User. If tables are created out of order (due to dependencies), there will be an error printed
+     */
+    void createUser() {
+        try{
+            createUser.execute();
+            System.out.println("created User");
+        }
+        catch (PSQLException e) {
+            String error = e.getLocalizedMessage();
+            System.out.println(error);
+            if(error.equals("ERROR: relation \"User\" does not exist")){
+                System.out.println("Foreign key issue will be resolved when the Users table is created first!");
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
-     * Insert a db into the database
-     * @param userID The ID of the user who is doing the dbed
-     * @param dbID The ID of the user to be dbed
+     * Create Stretch table.
+     * If tables are created out of order (due to dependencies), there will be an error printed
+     */
+    void createStretch() {
+        try{
+            createStretch.execute();
+            System.out.println("created Stretch");
+        }
+        catch (PSQLException e) {
+            String error = e.getLocalizedMessage();
+            System.out.println(error);
+            if(error.equals("ERROR: relation \"User\" does not exist")){
+                System.out.println("Foreign key issue will be resolved when the Users table is created first!");
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Create Smart table.
+     * If tables are created out of order (due to dependencies), there will be an error printed
+     */
+    void createSmart() {
+        try{
+            createSmart.execute();
+            System.out.println("created Smart");
+        }
+        catch (PSQLException e) {
+            String error = e.getLocalizedMessage();
+            System.out.println(error);
+            if(error.equals("ERROR: relation \"User\" does not exist")){
+                System.out.println("Foreign key issue will be resolved when the Users table is created first!");
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Insert a User into the database
      * @return The number of rows that were inserted
      */
-    int insertdb(int userID, int dbID) {
+    int insertUser() {
         count = 0;
         try {
-            insertdb.setInt(1, userID);
-            insertdb.setInt(2, dbID);
-            count += insertdb.executeUpdate();
-            System.out.println("inserted " + count + " row(s) in db");
+            count += insertUser.executeUpdate();
+            System.out.println("inserted " + count + " row(s) in User");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -195,24 +278,147 @@ public class Database {
     }
 
     /**
-     * Query the database to see all of the dbed users for a given user
-     * @param userID the one who dbed the users
-     * @return The list of dbed users
+     * Insert a Stretch goal into the database
+     * @param goal The actual content of the goal being inserted into the database
+     * @return The number of rows that were inserted
      */
-    ArrayList<Integer> selectAlldbed(int userID) {
-        ArrayList<Integer> dbedUsers = new ArrayList<Integer>();
+    int insertStretch(String goal, int authorID) {
+        count = 0;
         try {
-            selectAlldbed.setInt(1, userID);
-            ResultSet rs = selectAlldbed.executeQuery();
-            if (rs.next()) {
-                dbedUsers.add(rs.getInt("dbedID"));
+            insertStretch.setString(1, goal);
+            insertStretch.setInt(2, authorID);
+            count += insertStretch.executeUpdate();
+            System.out.println("inserted " + count + " row(s) in Stretch");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    /**
+     * Insert a SMART goal into the database
+     * @param stretchID The ID of the stretch goal that the SMART goal is associated with
+     * @param specific The specific part of the SMART goal
+     * @param measureable The measureable part of the SMART goal
+     * @param attainable The attainable part of the SMART goal
+     * @param relevant The relevant part of the SMART goal
+     * @param time The time part of the SMART goal
+     * @return The number of rows that were inserted
+     */
+    int insertdb(int stretchID, String specific, String measureable, String attainable, String relevant, String time) {
+        count = 0;
+        try {
+            insertSmart.setInt(1, stretchID);
+            insertSmart.setString(2, specific);
+            insertSmart.setString(3, measureable);
+            insertSmart.setString(4, attainable);
+            insertSmart.setString(5, relevant);
+            insertSmart.setString(6, time);
+            count += insertSmart.executeUpdate();
+            System.out.println("inserted " + count + " row(s) in Smart");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    /**
+     * Delete a User
+     * @param userID The primary key of the user
+     * @return The number of rows that were deleted.
+     */
+    int deleteUser(int userID) {
+        count = 0;
+        try {
+            deleteUser.setInt(1, userID);
+            count += deleteUser.executeUpdate();
+            System.out.println("deleted " + count + " row(s) from User");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    /**
+     * Delete a Stretch goal
+     * @param stretchID The primary key of the stretch goal
+     * @return The number of rows that were deleted.
+     */
+    int deleteStretch(int stretchID) {
+        count = 0;
+        try {
+            deleteStretch.setInt(1, stretchID);
+            count += deleteStretch.executeUpdate();
+            System.out.println("deleted " + count + " row(s) from Stretch");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    /**
+     * Delete a Smart goal
+     * @param smartID The id of the smart goal
+     * @param stretchID The id of the stretch goal that it is associated with
+     * @return The number of rows that were deleted.
+     */
+    int deleteSmart(int smartID, int stretchID) {
+        count = 0;
+        try {
+            deleteSmart.setInt(1, smartID);
+            deleteSmart.setInt(1, stretchID);
+            count += deleteSmart.executeUpdate();
+            System.out.println("deleted " + count + " row(s) from Smart");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    /**
+     * Return all of the Stretch goals written by a particular user
+     * @param authorID the one who made the stretch goals
+     * @return The list of stretch goals
+     */
+    ArrayList<StretchGoalRow> selectStretchByUser(int authorID) {
+        ArrayList<StretchGoalRow> stretchGoals = new ArrayList<StretchGoalRow>();
+        try {
+            selectStretchByUser.setInt(1, authorID);
+            ResultSet rs = selectStretchByUser.executeQuery();
+            while (rs.next()) {
+                stretchGoals.add(new StretchGoalRow(rs.getString("goal")));
             }
-            if(dbedUsers.size() == 0){
-                System.out.println("selected 0 rows from db");
+            if(stretchGoals.size() == 0){
+                System.out.println("selected 0 rows from Stretch");
                 return null;
             }
-            System.out.println("selected ID's of users dbed by " + userID);
-            return dbedUsers;
+            System.out.println("selected stretch goals made by user " + authorID);
+            return stretchGoals;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Return all of the Smart goals associated with a stretch goal
+     * @param stretchID the id of the stretch goal that we want the SMART goals for
+     * @return The list of SMART goals
+     */
+    ArrayList<SmartGoalRow> selectSmartByStretch(int stretchID) {
+        ArrayList<SmartGoalRow> smartGoals = new ArrayList<SmartGoalRow>();
+        try {
+            selectSmartByStretch.setInt(1, stretchID);
+            ResultSet rs = selectSmartByStretch.executeQuery();
+            while (rs.next()) {
+                smartGoals.add(new SmartGoalRow(rs.getString("specific"), rs.getString("measureable"), rs.getString("attainable"), rs.getString("relevant"), rs.getString("time")));
+            }
+            if(smartGoals.size() == 0){
+                System.out.println("selected 0 rows from Smart");
+                return null;
+            }
+            System.out.println("selected SMART goals for stretch goal " + stretchID);
+            return smartGoals;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -238,26 +444,7 @@ public class Database {
         return res;
     }
 
-    /**
-     * Create tblData.  If it already exists, this will print an error
-     * If tables are created out of order (due to dependencies), there will be an error printed
-     */
-    void createTable() {
-        try{
-            createdb.execute();
-            System.out.println("created db");
-        }
-        catch (PSQLException e) {
-            String error = e.getLocalizedMessage();
-            System.out.println(error);
-            if(error.equals("ERROR: relation \"users\" does not exist")){
-                System.out.println("Foreign key issue will be resolved when the Users table is created first!");
-            }
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     /**
      * Remove tblData from the database.  If it does not exist, this will print an error.
