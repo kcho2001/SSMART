@@ -376,6 +376,54 @@ public class Database {
     }
 
     /**
+     * Return all of the Smart goals associated with a stretch goal
+     * @param stretchID the id of the stretch goal that we want the SMART goals for
+     * @return The list of SMART goals
+     */
+    ArrayList<SmartGoalRow> selectSmarts() {
+        ArrayList<SmartGoalRow> smartGoals = new ArrayList<SmartGoalRow>();
+        try {
+            ResultSet rs = selectSmarts.executeQuery();
+            while (rs.next()) {
+                smartGoals.add(new SmartGoalRow(rs.getString("specific"), rs.getString("measureable"), rs.getString("attainable"), rs.getString("relevant"), rs.getString("time")));
+            }
+            if(smartGoals.size() == 0){
+                System.out.println("selected 0 rows from Smart");
+                return null;
+            }
+            System.out.println("selected all SMART goals");
+            return smartGoals;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Return all of the Stretch goals written by a particular user
+     * @param authorID the one who made the stretch goals
+     * @return The list of stretch goals
+     */
+    ArrayList<StretchGoalRow> selectStretchs(int authorID) {
+        ArrayList<StretchGoalRow> stretchGoals = new ArrayList<StretchGoalRow>();
+        try {
+            ResultSet rs = selectStretchs.executeQuery();
+            while (rs.next()) {
+                stretchGoals.add(new StretchGoalRow(rs.getString("goal")));
+            }
+            if(stretchGoals.size() == 0){
+                System.out.println("selected 0 rows from Stretch");
+                return null;
+            }
+            System.out.println("selected all Stretch goals");
+            return stretchGoals;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Return all of the Stretch goals written by a particular user
      * @param authorID the one who made the stretch goals
      * @return The list of stretch goals
@@ -426,43 +474,62 @@ public class Database {
     }
 
     /**
-     * Delete a row by primary key
-     * @param userID The one undbing a user
-     * @param dbID The id of the user to be undbed
-     * @return The number of rows that were deleted.
-     */
-    int deletedb(int userID, int dbID) {
-        int res = 0;
-        try {
-            deletedb.setInt(1, userID);
-            deletedb.setInt(2, dbID);
-            res = deletedb.executeUpdate();
-            System.out.println("deleted " + res + " row(s) from db");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return res;
-    }
-
-
-
-    /**
-     * Remove tblData from the database.  If it does not exist, this will print an error.
+     * Remove User table from the database.
      * If tables are dropped in the wrong order (due to dependencies), an error is printed
      */
-    void dropTable() {
+    void dropUser() {
         try{
-            dropdb.execute();
-            System.out.println("dropped db");
+            dropUser.execute();
+            System.out.println("dropped User");
         } catch (SQLException e) {
             int errNo = e.getErrorCode();
             if (errNo == 0){
                 System.out.println("Error: Drop tables in the correct order to prevent violations of foreign keys!");
-                System.out.println("Drop Flags, db, Votes, then Comments, then Messages, and lastly Users");
+                System.out.println("Drop Smart, Streth, and then User");
             }
             else{
                 e.printStackTrace();
             }
         }
-    }   
+    }
+
+    /**
+     * Remove Stretch table from the database.
+     * If tables are dropped in the wrong order (due to dependencies), an error is printed
+     */
+    void dropStretch() {
+        try{
+            dropStretch.execute();
+            System.out.println("dropped Stretch");
+        } catch (SQLException e) {
+            int errNo = e.getErrorCode();
+            if (errNo == 0){
+                System.out.println("Error: Drop tables in the correct order to prevent violations of foreign keys!");
+                System.out.println("Drop Smart, Streth, and then User");
+            }
+            else{
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Remove Smart table from the database.
+     * If tables are dropped in the wrong order (due to dependencies), an error is printed
+     */
+    void dropSmart() {
+        try{
+            dropSmart.execute();
+            System.out.println("dropped Smart");
+        } catch (SQLException e) {
+            int errNo = e.getErrorCode();
+            if (errNo == 0){
+                System.out.println("Error: Drop tables in the correct order to prevent violations of foreign keys!");
+                System.out.println("Drop Smart, Streth, and then User");
+            }
+            else{
+                e.printStackTrace();
+            }
+        }
+    }
 }
