@@ -57,6 +57,9 @@ public class Database {
     private Database() {
     }
 
+    /**
+     * Object that will hold all information for stretch goals
+     */
     class StretchGoalRow{
         String goal;
         
@@ -65,6 +68,9 @@ public class Database {
         }
     }
 
+    /**
+     * Object that will hold all information for SMART goals
+     */
     class SmartGoalRow{
         String specific;
         String measureable;
@@ -78,6 +84,16 @@ public class Database {
             this.attainable = attainable;
             this.relevant = relevant;
             this.time = time;
+        }
+    }
+
+    /**
+     * Object that will hold all information for users
+     */
+    class UserRow{
+
+        public UserRow(){
+
         }
     }
 
@@ -376,6 +392,29 @@ public class Database {
     }
 
     /**
+     * Return all of the Users and their information
+     * @return The list of SMART goals
+     */
+    ArrayList<UserRow> selectUsers() {
+        ArrayList<UserRow> users = new ArrayList<UserRow>();
+        try {
+            ResultSet rs = selectUsers.executeQuery();
+            while (rs.next()) {
+                users.add(new UserRow());
+            }
+            if(users.size() == 0){
+                System.out.println("selected 0 rows from User");
+                return null;
+            }
+            System.out.println("selected all users");
+            return users;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Return all of the Smart goals associated with a stretch goal
      * @param stretchID the id of the stretch goal that we want the SMART goals for
      * @return The list of SMART goals
@@ -400,11 +439,10 @@ public class Database {
     }
 
     /**
-     * Return all of the Stretch goals written by a particular user
-     * @param authorID the one who made the stretch goals
+     * Return all of the Stretch goals
      * @return The list of stretch goals
      */
-    ArrayList<StretchGoalRow> selectStretchs(int authorID) {
+    ArrayList<StretchGoalRow> selectStretchs() {
         ArrayList<StretchGoalRow> stretchGoals = new ArrayList<StretchGoalRow>();
         try {
             ResultSet rs = selectStretchs.executeQuery();
