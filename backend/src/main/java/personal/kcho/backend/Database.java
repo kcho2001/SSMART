@@ -19,12 +19,12 @@ public class Database {
 
     //Initialization of preparedStatements
     //Create Tables
-    private PreparedStatement createUser;
+    private PreparedStatement createUsers;
     private PreparedStatement createStretch;
     private PreparedStatement createSmart;
 
     //Drop Tables
-    private PreparedStatement dropUser;
+    private PreparedStatement dropUsers;
     private PreparedStatement dropStretch;
     private PreparedStatement dropSmart;
 
@@ -32,6 +32,11 @@ public class Database {
     private PreparedStatement selectUsers;
     private PreparedStatement selectStretchs;
     private PreparedStatement selectSmarts;
+
+    //Select One
+    private PreparedStatement selectUser;
+    private PreparedStatement selectStretch;
+    private PreparedStatement selectSmart;
 
     //Delete row
     private PreparedStatement deleteUser;
@@ -91,9 +96,10 @@ public class Database {
      * Object that will hold all information for users
      */
     class UserRow{
+        String name;
 
-        public UserRow(){
-
+        public UserRow(String name){
+            this.name = name;
         }
     }
 
@@ -141,37 +147,44 @@ public class Database {
             // Note: no "IF NOT EXISTS" checks on table 
             // so multiple executions of creation will cause an exception
             // For explanation of how the database is setup, check README.md
-            db.createUser = db.mConnection.prepareStatement("CREATE TABLE User (userID SERIAL PRIMARY KEY)");
+            db.createUsers = db.mConnection.prepareStatement("CREATE TABLE Users (userID SERIAL PRIMARY KEY, name VARCHAR(50) NOT NULL)");
                     
             db.createStretch = db.mConnection.prepareStatement("CREATE TABLE Stretch (stretchID SERIAL PRIMARY KEY, goal VARCHAR(300), authorID INT, "
-            + "FOREIGN KEY (authorID) references User (userID))");
+            + "FOREIGN KEY (authorID) references Users (userID))");
 
             db.createSmart = db.mConnection.prepareStatement("CREATE TABLE Smart (smartID SERIAL, stretchID INT, specific VARCHAR(200), "
             + "measureable VARCHAR(200), attainable VARCHAR(200), relevant VARCHAR(200), time VARCHAR(200), PRIMARY KEY (smartID, stretchID), "
             + "FOREIGN KEY (stretchID) references Stretch (stretchID))");
 
-            db.dropUser = db.mConnection.prepareStatement("DROP TABLE IF EXISTS User");
+            db.dropUsers = db.mConnection.prepareStatement("DROP TABLE IF EXISTS Users");
 
             db.dropStretch = db.mConnection.prepareStatement("DROP TABLE IF EXISTS Stretch");
 
             db.dropSmart = db.mConnection.prepareStatement("DROP TABLE IF EXISTS Smart");
 
             //Select alls
-            db.selectUsers = db.mConnection.prepareStatement("SELECT * FROM User");
+            db.selectUsers = db.mConnection.prepareStatement("SELECT * FROM Users");
 
             db.selectStretchs = db.mConnection.prepareStatement("SELECT * FROM Stretch");
 
             db.selectSmarts = db.mConnection.prepareStatement("SELECT * FROM Smart");
 
+            //Select one specific row
+            db.selectUser = db.mConnection.prepareStatement("SELECT * FROM Users where userID = ?");
+
+            db.selectStretch = db.mConnection.prepareStatement("SELECT * FROM Stretch where stretchID = ?");
+
+            db.selectSmart = db.mConnection.prepareStatement("SELECT * FROM Smart where smartID = ? and stretchID = ?");
+
             //Insert row
-            db.insertUser = db.mConnection.prepareStatement("INSERT INTO User VALUES (default)");
+            db.insertUser = db.mConnection.prepareStatement("INSERT INTO Users VALUES (default, ?)");
 
             db.insertStretch = db.mConnection.prepareStatement("INSERT INTO Stretch VALUES (default, ?, ?)");
 
-            db.insertSmart = db.mConnection.prepareStatement("INSERT INTO User VALUES (default, ?, ?, ?, ?, ?, ?)");
+            db.insertSmart = db.mConnection.prepareStatement("INSERT INTO Smart VALUES (default, ?, ?, ?, ?, ?, ?)");
 
             //Delete one specific row from a table
-            db.deleteUser = db.mConnection.prepareStatement("DELETE FROM User WHERE userID = ?");
+            db.deleteUser = db.mConnection.prepareStatement("DELETE FROM Users WHERE userID = ?");
 
             db.deleteStretch = db.mConnection.prepareStatement("DELETE FROM Stretch WHERE stretchID = ?");
 
@@ -218,15 +231,15 @@ public class Database {
     /**
      * Create User. If tables are created out of order (due to dependencies), there will be an error printed
      */
-    void createUser() {
+    void createUsers() {
         try{
-            createUser.execute();
-            System.out.println("created User");
+            createUsers.execute();
+            System.out.println("created Users");
         }
         catch (PSQLException e) {
             String error = e.getLocalizedMessage();
             System.out.println(error);
-            if(error.equals("ERROR: relation \"User\" does not exist")){
+            if(error.equals("ERROR: relation \"Users\" does not exist")){
                 System.out.println("Foreign key issue will be resolved when the Users table is created first!");
             }
         }
@@ -247,7 +260,7 @@ public class Database {
         catch (PSQLException e) {
             String error = e.getLocalizedMessage();
             System.out.println(error);
-            if(error.equals("ERROR: relation \"User\" does not exist")){
+            if(error.equals("ERROR: relation \"Users\" does not exist")){
                 System.out.println("Foreign key issue will be resolved when the Users table is created first!");
             }
         }
@@ -268,7 +281,7 @@ public class Database {
         catch (PSQLException e) {
             String error = e.getLocalizedMessage();
             System.out.println(error);
-            if(error.equals("ERROR: relation \"User\" does not exist")){
+            if(error.equals("ERROR: relation \"Users\" does not exist")){
                 System.out.println("Foreign key issue will be resolved when the Users table is created first!");
             }
         }
@@ -280,13 +293,15 @@ public class Database {
 
     /**
      * Insert a User into the database
+     * @param name the name of the user being added
      * @return The number of rows that were inserted
      */
-    int insertUser() {
+    int insertUser(String name) {
         count = 0;
         try {
+            insertUser.setString(1, name);
             count += insertUser.executeUpdate();
-            System.out.println("inserted " + count + " row(s) in User");
+            System.out.println("inserted " + count + " row(s) in Users");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -321,7 +336,7 @@ public class Database {
      * @param time The time part of the SMART goal
      * @return The number of rows that were inserted
      */
-    int insertdb(int stretchID, String specific, String measureable, String attainable, String relevant, String time) {
+    int insertSmart(int stretchID, String specific, String measureable, String attainable, String relevant, String time) {
         count = 0;
         try {
             insertSmart.setInt(1, stretchID);
@@ -348,7 +363,7 @@ public class Database {
         try {
             deleteUser.setInt(1, userID);
             count += deleteUser.executeUpdate();
-            System.out.println("deleted " + count + " row(s) from User");
+            System.out.println("deleted " + count + " row(s) from Users");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -400,10 +415,10 @@ public class Database {
         try {
             ResultSet rs = selectUsers.executeQuery();
             while (rs.next()) {
-                users.add(new UserRow());
+                users.add(new UserRow(rs.getString("name")));
             }
             if(users.size() == 0){
-                System.out.println("selected 0 rows from User");
+                System.out.println("selected 0 rows from Users");
                 return null;
             }
             System.out.println("selected all users");
@@ -455,6 +470,83 @@ public class Database {
             }
             System.out.println("selected all Stretch goals");
             return stretchGoals;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Return User information for one user
+     * @param userID the id of the user being queried
+     * @return the user information
+     */
+    UserRow selectUser(int userID) {
+        UserRow user = null;
+        try {
+            selectUser.setInt(1, userID);
+            ResultSet rs = selectUser.executeQuery();
+            if (rs.next()) {
+                user = new UserRow(rs.getString("name"));
+            }
+            else {
+                System.out.println("userID " + userID + " is not valid");
+                return null;
+            }
+            System.out.println("selected 1 row from Users");
+            return user;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Return a Stretch goal based on stretchID
+     * @param stretchID the id of the stretch goal
+     * @return the stretch goal information
+     */
+    StretchGoalRow selectStretch(int stretchID) {
+        StretchGoalRow stretchGoal = null;
+        try {
+            selectStretch.setInt(1, stretchID);
+            ResultSet rs = selectStretch.executeQuery();
+            if (rs.next()) {
+                stretchGoal = new StretchGoalRow(rs.getString("goal"));
+            }
+            else {
+                System.out.println("stretchID " + stretchID + " is not valid");
+                return null;
+            }
+            System.out.println("selected 1 row from Stretch");
+            return stretchGoal;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    /**
+     * Return a Smart goal based on its ID and the ID of the stretch goal it is associated with
+     * @param smartID the id of the specific smart goal
+     * @param stretchID the id of the stretch goal
+     * @return the smart goal information
+     */
+    SmartGoalRow selectSmart(int smartID, int stretchID) {
+        SmartGoalRow smartGoal = null;
+        try {
+            selectSmart.setInt(1, smartID);
+            selectSmart.setInt(2, stretchID);
+            ResultSet rs = selectSmart.executeQuery();
+            if (rs.next()) {
+                smartGoal = new SmartGoalRow(rs.getString("specific"), rs.getString("measureable"), rs.getString("attainable"), rs.getString("relevant"), rs.getString("time"));
+            }
+            else {
+                System.out.println("smartID " + smartID + " or stretchID " + stretchID + " is not valid");
+                return null;
+            }
+            System.out.println("selected 1 row from Smart");
+            return smartGoal;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -515,15 +607,15 @@ public class Database {
      * Remove User table from the database.
      * If tables are dropped in the wrong order (due to dependencies), an error is printed
      */
-    void dropUser() {
+    void dropUsers() {
         try{
-            dropUser.execute();
-            System.out.println("dropped User");
+            dropUsers.execute();
+            System.out.println("dropped Users");
         } catch (SQLException e) {
             int errNo = e.getErrorCode();
             if (errNo == 0){
                 System.out.println("Error: Drop tables in the correct order to prevent violations of foreign keys!");
-                System.out.println("Drop Smart, Streth, and then User");
+                System.out.println("Drop Smart, Streth, and then Users");
             }
             else{
                 e.printStackTrace();
@@ -543,7 +635,7 @@ public class Database {
             int errNo = e.getErrorCode();
             if (errNo == 0){
                 System.out.println("Error: Drop tables in the correct order to prevent violations of foreign keys!");
-                System.out.println("Drop Smart, Streth, and then User");
+                System.out.println("Drop Smart, Streth, and then Users");
             }
             else{
                 e.printStackTrace();
@@ -563,7 +655,7 @@ public class Database {
             int errNo = e.getErrorCode();
             if (errNo == 0){
                 System.out.println("Error: Drop tables in the correct order to prevent violations of foreign keys!");
-                System.out.println("Drop Smart, Streth, and then User");
+                System.out.println("Drop Smart, Streth, and then Users");
             }
             else{
                 e.printStackTrace();
