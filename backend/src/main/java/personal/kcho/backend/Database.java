@@ -48,6 +48,11 @@ public class Database {
     private PreparedStatement insertStretch;
     private PreparedStatement insertSmart;
 
+    //Updates
+    private PreparedStatement updateUser;
+    private PreparedStatement updateStretch;
+    private PreparedStatement updateSmart;
+
     //Miscellaneous
     private PreparedStatement selectStretchByUser;
     private PreparedStatement selectSmartByStretch;
@@ -150,11 +155,11 @@ public class Database {
             db.createUsers = db.mConnection.prepareStatement("CREATE TABLE Users (userID SERIAL PRIMARY KEY, name VARCHAR(50) NOT NULL)");
                     
             db.createStretch = db.mConnection.prepareStatement("CREATE TABLE Stretch (stretchID SERIAL PRIMARY KEY, goal VARCHAR(300), authorID INT, "
-            + "FOREIGN KEY (authorID) references Users (userID))");
+            + "FOREIGN KEY (authorID) references Users (userID) ON DELETE CASCADE)");
 
             db.createSmart = db.mConnection.prepareStatement("CREATE TABLE Smart (smartID SERIAL, stretchID INT, specific VARCHAR(200), "
             + "measureable VARCHAR(200), attainable VARCHAR(200), relevant VARCHAR(200), time VARCHAR(200), PRIMARY KEY (smartID, stretchID), "
-            + "FOREIGN KEY (stretchID) references Stretch (stretchID))");
+            + "FOREIGN KEY (stretchID) references Stretch (stretchID) ON DELETE CASCADE)");
 
             db.dropUsers = db.mConnection.prepareStatement("DROP TABLE IF EXISTS Users");
 
@@ -182,6 +187,14 @@ public class Database {
             db.insertStretch = db.mConnection.prepareStatement("INSERT INTO Stretch VALUES (default, ?, ?)");
 
             db.insertSmart = db.mConnection.prepareStatement("INSERT INTO Smart VALUES (default, ?, ?, ?, ?, ?, ?)");
+
+            //Update row
+            db.updateUser = db.mConnection.prepareStatement("UPDATE Users SET name = ? where userID = ?");
+
+            db.updateStretch = db.mConnection.prepareStatement("UPDATE Stretch SET goal = ? where stretchID = ?");
+
+            db.updateSmart = db.mConnection.prepareStatement("UPDATE Smart SET specific = ?, measureable = ?, attainable = ?, " +
+            "relevant = ?, time = ? where smartID = ? and stretchID = ?");
 
             //Delete one specific row from a table
             db.deleteUser = db.mConnection.prepareStatement("DELETE FROM Users WHERE userID = ?");
@@ -354,6 +367,73 @@ public class Database {
     }
 
     /**
+     * Update a User's information
+     * @param userID The id of the User
+     * @param name The new name of the User
+     * @return The number of rows that were updated.
+     */
+    int updateUser(int userID, String name) {
+        count = 0;
+        try {
+            updateUser.setString(1, name);
+            updateUser.setInt(2, userID);
+            count += updateUser.executeUpdate();
+            System.out.println("Updated " + count + " row(s) from User");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    /**
+     * Update a Stretch Goal
+     * @param stretchID The id of the stretch goal
+     * @param goal The new goal
+     * @return The number of rows that were updated.
+     */
+    int updateStretch(int stretchID, String goal) {
+        count = 0;
+        try {
+            updateStretch.setString(1, goal);
+            updateStretch.setInt(2, stretchID);
+            count += updateStretch.executeUpdate();
+            System.out.println("Updated " + count + " row(s) from Stretch");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    /**
+     * Update a Smart Goal
+     * @param smartID The id of the smart goal
+     * @param stretchID The id of the stretch goal
+     * @param specific the new specific portion of the goal
+     * @param measureable the new measureable portion of the goal
+     * @param attainable the new attainable portion of the goal
+     * @param relevant the new relevant portion of the goal
+     * @param time the new time portion of the goal
+     * @return The number of rows that were updated.
+     */
+    int updateSmart(int smartID, int stretchID, String specific, String measureable, String attainable, String relevant, String time) {
+        count = 0;
+        try {
+            updateSmart.setString(1, specific);
+            updateSmart.setString(2, measureable);
+            updateSmart.setString(3, attainable);
+            updateSmart.setString(4, relevant);
+            updateSmart.setString(5, time);
+            updateSmart.setInt(6, smartID);
+            updateSmart.setInt(7, stretchID);
+            count += updateSmart.executeUpdate();
+            System.out.println("Updated " + count + " row(s) from Smart");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    /**
      * Delete a User
      * @param userID The primary key of the user
      * @return The number of rows that were deleted.
@@ -397,7 +477,7 @@ public class Database {
         count = 0;
         try {
             deleteSmart.setInt(1, smartID);
-            deleteSmart.setInt(1, stretchID);
+            deleteSmart.setInt(2, stretchID);
             count += deleteSmart.executeUpdate();
             System.out.println("deleted " + count + " row(s) from Smart");
         } catch (SQLException e) {
