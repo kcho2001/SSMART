@@ -1,0 +1,46 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "description": "Web Front-End",
+  "dependencies": {
+    "google-auth-library": "^7.10.3",
+    "handlebars": "^4.7.7",
+    "http-server": "^13.0.2",
+    "jasmine": "^3.10.0",
+    "jquery": "^3.6.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router-dom": "^5.3.0"
+  },
+  "main": "index.js",
+  "devDependencies": {
+    "@types/jquery": "^3.5.9",
+    "@types/mocha": "^9.0.0",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "@types/react-router-dom": "^5.3.2",
+    "copy-webpack-plugin": "^9.1.0",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.5.1",
+    "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.2",
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.7.3",
+    "webpack-merge": "^5.8.0"
+  },
+  "repository": {
+    "type": "bitbucket",
+    "url": "bitbucket:https://bitbucket.org/chm321/cse216_shr222/src/master/"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cross-env NODE_ENV=development webpack serve --config config/webpack.dev.js --open",
+    "build": "cross-env NODE_ENV=production webpack --config config/webpack.prod.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
