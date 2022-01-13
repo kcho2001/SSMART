@@ -22,6 +22,9 @@
 # Target Folder #
 /backend/target/*
 
+# Node Modules #
+/web/node_modules/*
+
 # .vscode #
 .vscode/
 
