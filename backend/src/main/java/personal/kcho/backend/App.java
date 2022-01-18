@@ -17,13 +17,17 @@ public class App
     {
         final Gson gson = new Gson();
         //Connect to the database
-        String db_url = System.getenv("DATABASE_URL");
+        //String db_url = System.getenv("DATABASE_URL");
+        String db_url = "postgres://bsicetporpfarr:09e2fd2095f5cb2a28dfd27f8d5460e709a684eed4c24b2da9dd9615b9155c37@ec2-18-233-104-114.compute-1.amazonaws.com:5432/da33ktj2nj43fj";
         Database db = Database.getDatabase(db_url);
 
         if(db == null) //Ensure that we are connected to the database
             return;
         
+        //Set default port variable
         Spark.port(4567);
+        //Tell Spark where the static html files are located: Spark initially assumes -> /src/main/resources/
+        Spark.staticFileLocation("/web");
 
         Spark.get("/", (request, response) -> {
             response.redirect("/index.html");
