@@ -12,6 +12,7 @@ import personal.kcho.backend.Database.*;
 public class AppTest 
     extends TestCase
 {
+    String db_url = "postgres://bsicetporpfarr:09e2fd2095f5cb2a28dfd27f8d5460e709a684eed4c24b2da9dd9615b9155c37@ec2-18-233-104-114.compute-1.amazonaws.com:5432/da33ktj2nj43fj";
     /**
      * Create the test case
      *
@@ -53,7 +54,7 @@ public class AppTest
     public void testCreate(){
         System.out.println("\nTest: creating database tables");
         //Connect to the database
-        String db_url = System.getenv("DATABASE_URL");
+        //String db_url = System.getenv("DATABASE_URL");
         Database db = Database.getDatabase(db_url);
 
         if(db == null) //Ensure that we are connected to the database
@@ -69,7 +70,7 @@ public class AppTest
         System.out.println("\nTest: inserting rows into tables and selecting specific rows");
 
         //Connect to the database
-        String db_url = System.getenv("DATABASE_URL");
+        //String db_url = System.getenv("DATABASE_URL");
         Database db = Database.getDatabase(db_url);
 
         if(db == null) //Ensure that we are connected to the database
@@ -103,7 +104,7 @@ public class AppTest
         System.out.println("\nTest: inserting rows into tables and selecting all rows");
 
         //Connect to the database
-        String db_url = System.getenv("DATABASE_URL");
+        //String db_url = System.getenv("DATABASE_URL");
         Database db = Database.getDatabase(db_url);
 
         if(db == null) //Ensure that we are connected to the database
@@ -140,7 +141,7 @@ public class AppTest
         System.out.println("\nTest: insert rows and then delete them (also test delete cascades)");
 
         //Connect to the database
-        String db_url = System.getenv("DATABASE_URL");
+        //String db_url = System.getenv("DATABASE_URL");
         Database db = Database.getDatabase(db_url);
 
         if(db == null) //Ensure that we are connected to the database
@@ -191,7 +192,7 @@ public class AppTest
         System.out.println("\nTest: inserting rows into tables and updating rows");
 
         //Connect to the database
-        String db_url = System.getenv("DATABASE_URL");
+        //String db_url = System.getenv("DATABASE_URL");
         Database db = Database.getDatabase(db_url);
 
         if(db == null) //Ensure that we are connected to the database
@@ -238,7 +239,7 @@ public class AppTest
         System.out.println("\nTest: miscellaneous selects");
 
         //Connect to the database
-        String db_url = System.getenv("DATABASE_URL");
+        //String db_url = System.getenv("DATABASE_URL");
         Database db = Database.getDatabase(db_url);
 
         if(db == null) //Ensure that we are connected to the database
