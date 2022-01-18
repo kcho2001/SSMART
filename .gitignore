@@ -22,6 +22,9 @@
 # Target Folder #
 /backend/target/*
 
+# Backend Resources Folder #
+/backend/src/main/resources/*
+
 # Node Modules #
 /web/node_modules/*
 
