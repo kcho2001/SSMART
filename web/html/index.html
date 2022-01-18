@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="handlebars.min.js"></script>
+  <script src="templates.js"></script>
+  <script src="jquery.min.js"></script>
+  <script src="app.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css?family=Fresca" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSMART</title>
+</head>
+
+<body class="center">
+    <!--Top navbar of the site before login--> 
+    <div class="topnav" id="topnavBeforeLogin"> 
+    </div>
+    <div id="logIn" class="center">
+      <h3 style="color: red">You are currently not signed in!</h3>
+      <!--Google Sign On Banner       <div class="g-signin2" style="margin:auto" data-onsuccess="onSignIn"></div>-->
+    </div>
+
+    <!--Top navbar of the site with Home and Global functionality--> 
+    <div class="topnav" id="topnav"> 
+      <h1>SSMART</h1>
+      <button style="float:left" id="showProfile">Home</button>
+      <button style="float:left" id="showAddForm">See Other Goals!</button>
+      <button style="float:right" id="logoutButton" onclick="signout();">Logout</button>
+    </div>
+
+    <!--Add form-->
+    <div class="center" id="addElement">
+      <h2>Create New Goal!</h2>
+      <table class="center">
+        <tr style="padding: 20px;">
+          <td><label>Stretch Goal</label></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="newStretchGoal"/></td>
+        </tr>
+        <tr>
+            <button id="addSmartButton">Add a SMART goal</button>
+        </tr>
+        <tr>
+          <td>
+            <button id="addButton">Confirm</button>
+            <button id="addCancel">Cancel</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!--Edit form-->
+    <div id="editElement" class="center">
+      <h2>Edit Existing Post</h2>
+        <table class="center">
+          <div id="editMessageID"></div>
+        <tr style="padding: 20px;">
+          <td><label>Subject</label></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="editSubject"/></td>
+        </tr>
+        <tr>
+          <td><label style="font-size: large;">Message</label></td>
+        </tr>
+        <tr>
+          <td><textarea style="width: 650px; height: 150px" id="editMessage"></textarea></td>
+        </tr>
+        <tr>
+          <td>
+            <button id="editButton">Update</button>
+            <button id="editCancel">Cancel</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!--Main element list-->
+    <div class="center" id="showElements">
+      <div id="ElementList-goalList"></div>
+    </div>
+</body>
+
+    <!--I think this is to reference icons <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+</html>
