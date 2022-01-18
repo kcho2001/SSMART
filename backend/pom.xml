@@ -1,8 +1,48 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <groupId>personal.kcho.backend</groupId>
+  <artifactId>ssmart-195</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>ssmart-195</name>
+  <url>https://ssmart-195.herokuapp.com/</url>
+  <packaging>jar</packaging>
+
   <build>
     <plugins>
+      <plugin>
+        <groupId>com.heroku.sdk</groupId>
+        <artifactId>heroku-maven-plugin</artifactId>
+        <version>3.0.4</version>
+        <configuration>
+          <jdkVersion>1.8</jdkVersion>
+          <appName>ssmart-195</appName>
+          <processTypes>
+            <web>java -jar ./target/ssmart-195-1.0-SNAPSHOT-jar-with-dependencies.jar</web>
+          </processTypes>
+        </configuration>
+      </plugin>
+      <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <executions>
+              <execution>
+                  <phase>package</phase>
+                  <goals>
+                      <goal>single</goal>
+                  </goals>
+              </execution>
+          </executions>
+          <configuration>
+              <descriptorRefs>
+                  <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+              <archive>
+                  <manifest>
+                      <mainClass>personal.kcho.backend.App</mainClass>
+                  </manifest>
+              </archive>
+          </configuration>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -11,20 +51,29 @@
           <mainClass>personal.kcho.backend.App</mainClass>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
-  <groupId>personal.kcho.backend</groupId>
-  <artifactId>backend</artifactId>
-  <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>backend</name>
-  <url>http://maven.apache.org</url>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>com.heroku.sdk</groupId>
+      <artifactId>heroku-maven-plugin</artifactId>
+      <version>3.0.4</version>
+  </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
