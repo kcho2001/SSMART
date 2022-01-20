@@ -25,7 +25,13 @@ public class App
             return;
         
         //Set default port variable
-        Spark.port(4567);
+        String port = System.getenv("PORT");
+        if(port == null){
+            Spark.port(4567);
+        }
+        else{
+            Spark.port(Integer.parseInt(port));
+        }
         //Tell Spark where the static html files are located: Spark initially assumes -> /src/main/resources/
         Spark.staticFileLocation("/web");
 
